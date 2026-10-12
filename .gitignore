@@ -1,0 +1,25 @@
+# Python virtual environment
+venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Static collected & media
+staticfiles/
+media/medical_reports/*
+!media/medical_reports/.gitkeep
+media/doctors/*
+!media/doctors/.gitkeep
+
+# Environment variables
+.env
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

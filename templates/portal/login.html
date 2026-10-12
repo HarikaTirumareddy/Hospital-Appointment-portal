@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign In - ApexCare Hospital Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="card card-custom p-4 p-md-5 shadow">
+                <div class="text-center mb-4">
+                    <div class="brand-icon mx-auto mb-3" style="width: 50px; height: 50px; font-size: 1.6rem;">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                    </div>
+                    <h2 class="fw-bold">Sign In to Portal</h2>
+                    <p class="text-muted small">Access your appointments, medical reports, or administrative controls.</p>
+                </div>
+
+                <!-- Demo Login Quick Fill Box for Evaluators -->
+                <div class="bg-primary-subtle border border-primary-subtle rounded-3 p-3 mb-4">
+                    <div class="fw-semibold small text-primary mb-2">
+                        <i class="bi bi-lightning-charge-fill me-1"></i> Quick-Fill Demo Credentials:
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" id="demo-fill-patient" class="btn btn-sm btn-outline-primary bg-white">
+                            <i class="bi bi-person me-1"></i> Demo Patient
+                        </button>
+                        <button type="button" id="demo-fill-admin" class="btn btn-sm btn-outline-primary bg-white">
+                            <i class="bi bi-shield-lock me-1"></i> Hospital Admin/Staff
+                        </button>
+                    </div>
+                    <div class="small text-muted mt-2" style="font-size: 0.75rem;">
+                        Patient: <code>john_patient</code> / <code>patientpassword123</code><br>
+                        Admin: <code>admin</code> / <code>adminpassword123</code>
+                    </div>
+                </div>
+
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger small py-2">
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label class="form-label" for="id_username">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white text-muted"><i class="bi bi-person"></i></span>
+                            <input type="text" name="username" autofocus required id="id_username" class="form-control" placeholder="Enter username">
+                        </div>
+                        {% if form.username.errors %}
+                            <div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label" for="id_password">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white text-muted"><i class="bi bi-key"></i></span>
+                            <input type="password" name="password" required id="id_password" class="form-control" placeholder="Enter password">
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary-custom btn-lg py-2 fw-bold">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4 pt-3 border-top">
+                    <p class="text-muted small mb-0">Don't have an account? <a href="{% url 'patient_register' %}" class="fw-bold text-primary">Register as new patient</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

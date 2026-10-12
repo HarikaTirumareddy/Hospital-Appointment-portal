@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Doctors - Staff Portal{% endblock %}
+
+{% block content %}
+<div class="bg-dark text-white py-4 border-bottom">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <span class="badge bg-warning text-dark px-3 py-1 rounded-pill fw-bold mb-2">Hospital Administration</span>
+                <h2 class="fw-bold mb-0 text-white"><i class="bi bi-people-fill me-2"></i>Doctor Management (Req #9)</h2>
+                <small class="text-light opacity-75">Add, edit, or remove hospital physicians and specialists.</small>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'staff_dashboard' %}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Staff Dashboard
+                </a>
+                <a href="{% url 'staff_doctor_create' %}" class="btn btn-warning btn-sm fw-bold text-dark">
+                    <i class="bi bi-plus-circle-fill me-1"></i> Add New Doctor
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="card card-custom p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">Physicians Directory ({{ doctors.count }})</h5>
+            <a href="{% url 'staff_doctor_create' %}" class="btn btn-sm btn-primary-custom">
+                <i class="bi bi-plus-lg me-1"></i> Add Doctor
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Doctor Name</th>
+                        <th>Department</th>
+                        <th>Specialization</th>
+                        <th>Experience</th>
+                        <th>Fee</th>
+                        <th>Room</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in doctors %}
+                    <tr>
+                        <td>
+                            <div class="fw-bold text-dark">{{ doc.name }}</div>
+                            <small class="text-muted">{{ doc.qualifications }}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary-subtle text-primary">
+                                {{ doc.department.name }}
+                            </span>
+                        </td>
+                        <td>{{ doc.specialization }}</td>
+                        <td>{{ doc.experience_years }} yrs</td>
+                        <td class="fw-bold text-success">${{ doc.consultation_fee }}</td>
+                        <td>{{ doc.room_number }}</td>
+                        <td>
+                            {% if doc.is_available %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group">
+                                <a href="{% url 'staff_doctor_edit' doc.id %}" class="btn btn-sm btn-outline-primary" title="Edit Doctor">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{% url 'staff_doctor_delete' doc.id %}" class="btn btn-sm btn-outline-danger" title="Delete Doctor">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            No doctors currently configured. Click "Add New Doctor" above.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

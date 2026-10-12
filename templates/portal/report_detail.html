@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ report.title }} - Medical Report{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Action Bar -->
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+        <a href="{% if user.is_staff %}{% url 'staff_dashboard' %}{% else %}{% url 'patient_dashboard' %}{% endif %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+        <div class="d-flex gap-2">
+            {% if report.report_file %}
+                <a href="{{ report.report_file.url }}" target="_blank" class="btn btn-outline-primary">
+                    <i class="bi bi-download me-1"></i> Download Attached Document
+                </a>
+            {% endif %}
+            <button type="button" class="btn btn-primary-custom" onclick="window.print()">
+                <i class="bi bi-printer me-1"></i> Print / Save as PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- Printable Medical Report Sheet -->
+    <div class="medical-report-sheet">
+        <!-- Hospital Header / Letterhead -->
+        <div class="report-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <div class="brand-icon" style="width: 48px; height: 48px; font-size: 1.5rem;">
+                    <i class="bi bi-hospital"></i>
+                </div>
+                <div>
+                    <h3 class="fw-bold mb-0 text-dark">ApexCare Hospital</h3>
+                    <small class="text-muted">Center for Advanced Diagnostics & Specialty Medicine</small><br>
+                    <small class="text-muted">100 Hospital Way, Medical Plaza, Metro City | Tel: +1 (800) 555-CARE</small>
+                </div>
+            </div>
+            <div class="text-end">
+                <div class="badge bg-primary fs-6 px-3 py-2">Official Medical Record</div>
+                <div class="small text-muted mt-1">Ref #: ACH-MED-{{ report.id|stringformat:"05d" }}</div>
+                <div class="small text-muted">Date: {{ report.created_at|date:"F d, Y" }}</div>
+            </div>
+        </div>
+
+        <div class="text-center my-4">
+            <h4 class="fw-bold text-uppercase tracking-wider text-dark">{{ report.title }}</h4>
+            <span class="badge bg-secondary-subtle text-secondary px-3 py-1">{{ report.report_type }}</span>
+        </div>
+
+        <!-- Patient & Doctor Metadata Grid -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="report-box h-100">
+                    <h6 class="fw-bold text-primary mb-2"><i class="bi bi-person-fill me-1"></i> Patient Information</h6>
+                    <div class="small">
+                        <div class="mb-1"><strong>Name:</strong> {{ report.patient.get_full_name|default:report.patient.username }}</div>
+                        <div class="mb-1"><strong>Patient ID:</strong> PAT-{{ report.patient.id|stringformat:"04d" }}</div>
+                        <div class="mb-1"><strong>Phone:</strong> {{ report.patient.patient_profile.phone|default:"N/A" }}</div>
+                        <div class="mb-1"><strong>Gender / Blood:</strong> {{ report.patient.patient_profile.gender|default:"N/A" }} / {{ report.patient.patient_profile.blood_group|default:"N/A" }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="report-box h-100">
+                    <h6 class="fw-bold text-primary mb-2"><i class="bi bi-person-badge-fill me-1"></i> Attending Physician</h6>
+                    <div class="small">
+                        <div class="mb-1"><strong>Doctor:</strong> {{ report.doctor.name|default:"Hospital Consulting Team" }}</div>
+                        <div class="mb-1"><strong>Department:</strong> {{ report.doctor.department.name|default:"General Medicine" }}</div>
+                        <div class="mb-1"><strong>Qualifications:</strong> {{ report.doctor.qualifications|default:"MBBS, Specialist" }}</div>
+                        {% if report.appointment %}
+                            <div class="mb-1"><strong>Visit Date:</strong> {{ report.appointment.appointment_date|date:"M d, Y" }} ({{ report.appointment.get_time_slot_display }})</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagnosis Section -->
+        <div class="mb-4">
+            <h5 class="fw-bold text-dark border-bottom pb-2">
+                <i class="bi bi-clipboard2-pulse-fill text-primary me-2"></i> Clinical Diagnosis & Evaluation
+            </h5>
+            <div class="p-3 bg-light rounded-3">
+                <p class="mb-0 text-dark leading-relaxed" style="white-space: pre-line;">
+                    {{ report.diagnosis|default:"No specific clinical diagnosis recorded for this report entry." }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Prescription & Notes -->
+        <div class="mb-4">
+            <h5 class="fw-bold text-dark border-bottom pb-2">
+                <i class="bi bi-capsule text-primary me-2"></i> Rx / Prescription & Medical Advice
+            </h5>
+            <div class="p-3 bg-light rounded-3">
+                <p class="mb-0 text-dark leading-relaxed font-monospace" style="white-space: pre-line; font-size: 0.95rem;">
+                    {{ report.prescription_notes|default:"Follow standard primary care instructions and hydration guidelines." }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Attachment notice if present -->
+        {% if report.report_file %}
+        <div class="mb-4 p-3 border rounded-3 bg-primary-subtle d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-paperclip fs-4 text-primary"></i>
+                <div>
+                    <strong>Attached Diagnostic Document</strong>
+                    <div class="small text-muted">{{ report.report_file.name }}</div>
+                </div>
+            </div>
+            <a href="{{ report.report_file.url }}" target="_blank" class="btn btn-sm btn-primary no-print">
+                View Attached File
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Signature Footer -->
+        <div class="pt-5 mt-5 border-top d-flex justify-content-between align-items-end">
+            <div>
+                <small class="text-muted d-block">Report generated digitally via ApexCare Portal.</small>
+                <small class="text-muted">Validated electronically on {{ report.created_at|date:"Y-m-d H:i" }} UTC</small>
+            </div>
+            <div class="text-center" style="min-width: 200px;">
+                <div class="border-bottom border-dark pb-1 mb-1 fw-bold text-dark">
+                    {{ report.doctor.name|default:"Authorized Medical Officer" }}
+                </div>
+                <small class="text-muted">Physician Signature & License Seal</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

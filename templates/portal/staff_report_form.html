@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Medical Report - Staff Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-custom p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="fw-bold mb-1">Generate Medical Report</h3>
+                        <p class="text-muted small mb-0">Record clinical evaluation, diagnosis, medications, and upload laboratory files.</p>
+                    </div>
+                    <a href="{% url 'staff_dashboard' %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+                    </a>
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label" for="{{ form.title.id_for_label }}">Report Title <span class="text-danger">*</span></label>
+                            {{ form.title }}
+                            {% if form.title.errors %}<div class="text-danger small mt-1">{{ form.title.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.patient.id_for_label }}">Patient <span class="text-danger">*</span></label>
+                            {{ form.patient }}
+                            {% if form.patient.errors %}<div class="text-danger small mt-1">{{ form.patient.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.doctor.id_for_label }}">Attending Physician</label>
+                            {{ form.doctor }}
+                            {% if form.doctor.errors %}<div class="text-danger small mt-1">{{ form.doctor.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.appointment.id_for_label }}">Linked Appointment (Optional)</label>
+                            {{ form.appointment }}
+                            {% if form.appointment.errors %}<div class="text-danger small mt-1">{{ form.appointment.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.report_type.id_for_label }}">Report Classification</label>
+                            {{ form.report_type }}
+                            {% if form.report_type.errors %}<div class="text-danger small mt-1">{{ form.report_type.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="{{ form.diagnosis.id_for_label }}">Clinical Diagnosis & Findings</label>
+                            {{ form.diagnosis }}
+                            {% if form.diagnosis.errors %}<div class="text-danger small mt-1">{{ form.diagnosis.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="{{ form.prescription_notes.id_for_label }}">Rx Prescription & Instructions</label>
+                            {{ form.prescription_notes }}
+                            {% if form.prescription_notes.errors %}<div class="text-danger small mt-1">{{ form.prescription_notes.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="{{ form.report_file.id_for_label }}">Attach Diagnostic File / PDF / Image (Optional)</label>
+                            {{ form.report_file }}
+                            {% if form.report_file.errors %}<div class="text-danger small mt-1">{{ form.report_file.errors.0 }}</div>{% endif %}
+                            <div class="form-text small text-muted">Upload laboratory report, scan, or official discharge document.</div>
+                        </div>
+
+                        <div class="col-12 pt-4 border-top d-flex justify-content-end gap-2">
+                            <a href="{% url 'staff_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary-custom px-4 fw-bold">
+                                <i class="bi bi-file-earmark-check me-1"></i> Issue Medical Report
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

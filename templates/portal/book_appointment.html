@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Book Doctor Appointment - ApexCare Hospital{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-4 border-bottom">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-1 text-white"><i class="bi bi-calendar2-plus-fill me-2"></i>Book an Appointment</h2>
+        <p class="text-light opacity-75 mb-0">Select your doctor, preferred date, and available time slot with zero double-booking conflicts.</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Conflict Prevention Feature Card -->
+            <div class="alert alert-info d-flex align-items-center gap-3 rounded-4 shadow-sm mb-4 border-0">
+                <div class="fs-2 text-info"><i class="bi bi-shield-lock-fill"></i></div>
+                <div>
+                    <h6 class="fw-bold mb-1">Double-Booking Prevention Engine Active</h6>
+                    <small class="mb-0">
+                        When you select a doctor and date, time slots already reserved by other patients are automatically disabled in real time. Server-side validation guarantees slot exclusivity.
+                    </small>
+                </div>
+            </div>
+
+            <div class="card card-custom p-4 p-md-5">
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <div class="fw-semibold"><i class="bi bi-exclamation-triangle-fill me-1"></i> {{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="POST" id="appointment-booking-form" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row g-4">
+                        <!-- 1. Doctor Selection -->
+                        <div class="col-12">
+                            <label class="form-label" for="id_doctor">
+                                <i class="bi bi-person-badge text-primary me-1"></i> Select Specialist Doctor <span class="text-danger">*</span>
+                            </label>
+                            {{ form.doctor }}
+                            {% if form.doctor.errors %}
+                                <div class="text-danger small mt-1">{{ form.doctor.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text small text-muted">
+                                Browse by department from the dropdown or check the <a href="{% url 'doctor_list' %}" target="_blank">Doctors Directory</a>.
+                            </div>
+                        </div>
+
+                        <!-- 2. Appointment Date -->
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_appointment_date">
+                                <i class="bi bi-calendar-event text-primary me-1"></i> Consultation Date <span class="text-danger">*</span>
+                            </label>
+                            {{ form.appointment_date }}
+                            {% if form.appointment_date.errors %}
+                                <div class="text-danger small mt-1">{{ form.appointment_date.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text small text-muted">
+                                Select today or a future date (min: {{ today_str }}).
+                            </div>
+                        </div>
+
+                        <!-- 3. Time Slot -->
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_time_slot">
+                                <i class="bi bi-clock-history text-primary me-1"></i> Available Time Slot <span class="text-danger">*</span>
+                            </label>
+                            {{ form.time_slot }}
+                            {% if form.time_slot.errors %}
+                                <div class="text-danger small mt-1">{{ form.time_slot.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text small" id="slot-availability-feedback">
+                                <span class="text-muted"><i class="bi bi-info-circle me-1"></i>Select doctor and date to view live availability.</span>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Visual Slot Selector Grid (Requirement #5) -->
+                        <div class="col-12">
+                            <div class="card bg-light border-0 p-3 rounded-4 shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                                    <div class="fw-bold small text-dark">
+                                        <i class="bi bi-grid-3x3-gap-fill text-primary me-1"></i> Interactive Time Slot Picker:
+                                    </div>
+                                    <div class="small">
+                                        <span class="badge bg-white text-dark border me-1"><i class="bi bi-circle-fill text-success small me-1"></i>Available</span>
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle me-1"><i class="bi bi-lock-fill small me-1"></i>Booked</span>
+                                        <span class="badge bg-primary text-white"><i class="bi bi-check-lg small me-1"></i>Selected</span>
+                                    </div>
+                                </div>
+
+                                <div class="small text-muted mb-2 fw-semibold">
+                                    <i class="bi bi-sun-fill text-warning me-1"></i> Morning Hours
+                                </div>
+                                <div class="row g-2 mb-3">
+                                    <div class="col-6 col-sm-4 col-md-2"><button type="button" class="slot-pill" data-slot-val="09:00">09:00 AM</button></div>
+                                    <div class="col-6 col-sm-4 col-md-2"><button type="button" class="slot-pill" data-slot-val="09:30">09:30 AM</button></div>
+                                    <div class="col-6 col-sm-4 col-md-2"><button type="button" class="slot-pill" data-slot-val="10:00">10:00 AM</button></div>
+                                    <div class="col-6 col-sm-4 col-md-2"><button type="button" class="slot-pill" data-slot-val="10:30">10:30 AM</button></div>
+                                    <div class="col-6 col-sm-4 col-md-2"><button type="button" class="slot-pill" data-slot-val="11:00">11:00 AM</button></div>
+                                    <div class="col-6 col-sm-4 col-md-2"><button type="button" class="slot-pill" data-slot-val="11:30">11:30 AM</button></div>
+                                </div>
+
+                                <div class="small text-muted mb-2 fw-semibold">
+                                    <i class="bi bi-cloud-sun-fill text-info me-1"></i> Afternoon & Evening Hours
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col-6 col-sm-4 col-md-2"><button type="button" class="slot-pill" data-slot-val="14:00">02:00 PM</button></div>
+                                    <div class="col-6 col-sm-4 col-md-2"><button type="button" class="slot-pill" data-slot-val="14:30">02:30 PM</button></div>
+                                    <div class="col-6 col-sm-4 col-md-2"><button type="button" class="slot-pill" data-slot-val="15:00">03:00 PM</button></div>
+                                    <div class="col-6 col-sm-4 col-md-2"><button type="button" class="slot-pill" data-slot-val="15:30">03:30 PM</button></div>
+                                    <div class="col-6 col-sm-4 col-md-2"><button type="button" class="slot-pill" data-slot-val="16:00">04:00 PM</button></div>
+                                    <div class="col-6 col-sm-4 col-md-2"><button type="button" class="slot-pill" data-slot-val="16:30">04:30 PM</button></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Symptoms / Reason -->
+                        <div class="col-12">
+                            <label class="form-label" for="id_symptoms_or_reason">
+                                <i class="bi bi-chat-left-text text-primary me-1"></i> Reason for Appointment / Primary Symptoms <span class="text-danger">*</span>
+                            </label>
+                            {{ form.symptoms_or_reason }}
+                            {% if form.symptoms_or_reason.errors %}
+                                <div class="text-danger small mt-1">{{ form.symptoms_or_reason.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text small text-muted">
+                                Briefly describe your current health condition, symptoms, or purpose of visit (e.g. routine checkup, persistent cough, joint stiffness).
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="col-12 pt-3 border-top d-flex justify-content-between align-items-center">
+                            <a href="{% url 'patient_dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary-custom px-5 py-3 fw-bold">
+                                <i class="bi bi-check2-circle me-1"></i> Confirm & Book Appointment
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ doctor.name }} - ApexCare Hospital{% endblock %}
+
+{% block content %}
+<div class="bg-light py-4 border-bottom">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'doctor_list' %}">Doctors</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ doctor.name }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Doctor Info Column -->
+        <div class="col-lg-8">
+            <div class="card card-custom p-4 p-md-5 mb-4">
+                <div class="d-flex flex-column flex-md-row align-items-center align-items-md-start gap-4 mb-4">
+                    <div class="doctor-avatar-box mb-0" style="width: 110px; height: 110px; font-size: 2.8rem;">
+                        {{ doctor.name|slice:":4"|cut:"Dr. "|slice:":1"|default:"D" }}
+                    </div>
+                    <div class="text-center text-md-start">
+                        <div class="badge bg-primary-subtle text-primary px-3 py-1 rounded-pill mb-2">
+                            <i class="bi {{ doctor.department.icon_class }} me-1"></i> {{ doctor.department.name }}
+                        </div>
+                        <h2 class="fw-bold mb-1">{{ doctor.name }}</h2>
+                        <div class="fs-5 text-primary fw-semibold mb-2">{{ doctor.specialization }}</div>
+                        <div class="text-muted"><i class="bi bi-mortarboard-fill me-1"></i> {{ doctor.qualifications }}</div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <h5 class="fw-bold mb-3"><i class="bi bi-file-person text-primary me-2"></i>About the Doctor</h5>
+                <p class="text-secondary leading-relaxed">
+                    {{ doctor.bio|default:"Specialist practitioner committed to personalized patient healthcare, modern diagnostic evaluation, and evidence-based treatments." }}
+                </p>
+
+                <h5 class="fw-bold mt-4 mb-3"><i class="bi bi-info-circle text-primary me-2"></i>Clinical Information</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <div class="small text-muted">Clinic / OPD Location</div>
+                            <div class="fw-bold text-dark">{{ doctor.room_number }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <div class="small text-muted">Consultation Schedule</div>
+                            <div class="fw-bold text-dark">{{ doctor.available_days }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <div class="small text-muted">Years of Experience</div>
+                            <div class="fw-bold text-dark">{{ doctor.experience_years }} Years of Clinical Practice</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <div class="small text-muted">Standard Consultation Fee</div>
+                            <div class="fw-bold text-success">${{ doctor.consultation_fee }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Action Column -->
+        <div class="col-lg-4">
+            <div class="card card-custom p-4 sticky-top" style="top: 100px;">
+                <h4 class="fw-bold mb-3">Book an Appointment</h4>
+                <p class="text-muted small mb-4">
+                    Reserve an exclusive consultation slot with Dr. {{ doctor.name }}. Live slot availability checked in real-time.
+                </p>
+
+                <div class="p-3 bg-primary-subtle rounded-3 mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="small text-muted">Consultation Fee:</span>
+                        <span class="fw-bold text-dark">${{ doctor.consultation_fee }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="small text-muted">Today's Bookings:</span>
+                        <span class="badge bg-primary">{{ today_booked_count }} of {{ total_slots }} slots booked</span>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a href="{% url 'book_appointment' %}?doctor_id={{ doctor.id }}" class="btn btn-primary-custom py-3 text-center">
+                        <i class="bi bi-calendar2-check-fill me-2"></i> Proceed to Book Slot
+                    </a>
+                    <a href="{% url 'doctor_list' %}" class="btn btn-outline-custom text-center">
+                        <i class="bi bi-arrow-left me-1"></i> Back to Doctors
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
